@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- head adapted from a project from https://github.com/awslabs/eb-demo-php-simple-app-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title> Capstone Budget Helper </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body {background: url(assets/img/background.png) repeat;}
+      .hero-unit {background-color: white;}
+    </style>
+    <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+</head>
+
+<!-- scrips adapted from old CPSC 360 project I did last semester-->
+<script language=JavaScript>
+function verify( form ) {
+	var name = form.elements[ "username" ];
+	var pass = form.elements[ "password" ];
+	if (( name.value == "" ) || ( pass.value == "" )) {
+		alert( "Password or username can't be blank" );
+		return false;
+	}
+	return true;
+}
+/*function post( file, map ) {
+   var form = document.createElement("form");
+   form.setAttribute( "method", "post");
+   form.setAttribute( "action",  file );
+
+   for (var key in map) {
+       var hiddenField = document.createElement( "input" );
+       hiddenField.setAttribute( "type", "hidden");
+       hiddenField.setAttribute( "name",  key );
+       hiddenField.setAttribute( "value", map[ key ]);
+
+      form.appendChild( hiddenField );
+    }
+    document.body.appendChild( form );
+    form.submit();
+}*/
+</script>
+
+<body>
+	<div class="container">
+		<h1>Capstone Budget Helper</h1>
+		<h2>Login</h2>
+<form action = "password.php" method = "post" onsubmit = "return verify(this)">
+	<div class="w3-row-padding">
+		<div class="w3-half">
+			<label>Username</label>
+			<input type="text" name="username" id= "username" class="input-xxlarge" placeholder= "Username">
+		</div>
+		<div class="w3-half">
+			<label>Password</label>
+			<input type="password" name="password" id="password" class="input-xxlarge" placeholder = "Password">
+		</div>
+	</div>
+	<input type="submit" value="Submit">
+</form>
+	<br></br>
+	</div> <!-- /container -->
+<!-- scripts adapted from a project from https://github.com/awslabs/eb-demo-php-simple-app-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+  </body>
+
+</html>
