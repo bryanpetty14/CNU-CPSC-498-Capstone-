@@ -1,4 +1,5 @@
 <?php
+include 'databaseConfig.php';
 //grab the user name and password from the form
 $username = $_POST['username'];
 $password = $_POST['password'];
@@ -8,7 +9,7 @@ error_reporting(E_ERROR | E_PARSE);
 
 //connect to database, only for local use right now
 //will update when the AWS RDS is set up
-$db = new mysqli("localhost", "user", "root", "test");
+$db = new mysqli($hostName, $hostUser, $hostPass, $dbName);
 if($db->connect_errno){
 	echo "database down";
 }
@@ -40,8 +41,18 @@ alert("Password or Username incorrect")
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <style>
-      body {background: url(assets/img/background.png) repeat;}
-      .hero-unit {background-color: white;}
+      body {background: #C6C8DCCA;}
+      .hero-unit {background-color: #dfe6e9;}	
+	nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #a00000;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
     </style>
     <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet">
     <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -58,23 +69,33 @@ alert("Password or Username incorrect")
 		}
 		return true;
 	}
-</script>
-<script language=JavaScript>
-	function checkValues( form ) {
+	function verifyMonth( form ) {
 		var month = form.elements[ "Month" ];
 		var year = form.elements[ "Year" ];
-		if( (isNaN(month.value) ) || (isNaN(year.value))){
+		if(month.value == "" || year.value == ""){
+			alert("both month and year need a value");
+			return false;
+		}
+		else if( (isNaN(month.value) ) || (isNaN(year.value))){
 			alert("Please enter numbers only");
-			return false
+			return false;
 		} 
-		else if ((month.value <0 ) || ( month.value >12 )) {
+		else if (( parseInt(month.value) <0 ) || ( parseInt(month.value) >12 )) {
 			alert( "Month cannot be less than 0 or greater than 12" );
 			return false;
 		}
 		return true;
 	}
 </script>
-
+<nav class = "navbar navbar-light" style = "background-color: #636e72;
+    position: fixed;
+    top: 0;">
+		<div class = "container-fluid">
+				<div class = "a">
+				<h1 style ="text-align: center; color:white;">Capstone Budget Helper</h1>
+				</div>
+		</div>	
+	</nav>
 <body>
 	<div class="container">
 		<h1>Capstone Budget Helper</h1>
@@ -115,16 +136,37 @@ alert("Password or Username incorrect")
 
 		<link href="assets/css/bootstrap.min.css" rel="stylesheet">
 		<style>
-		  body {background: url(assets/img/background.png) repeat;}
-		  .hero-unit {background-color: white;}
+      body {background: #C6C8DCCA;}
+      .hero-unit {background-color: #dfe6e9;}
+	nav {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+		background-color: #a00000;
+		position: fixed;
+		top: 0;
+		width: 100%;
+}
 		</style>
 		<link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet">
 		<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 	</head>
+	<nav class = "navbar navbar-light" style = "background-color: #636e72;
+    position: fixed;
+    top: 0;">
+		<div class = "container-fluid">
+				<div class = "a">
+				<h1 style ="text-align: center; color:white;">Capstone Budget Helper</h1>
+				</div>
+		</div>	
+	</nav>
+	<br></br>
+	<br></br>
 	<body>
 		<div class = "container">
 			<h2>Input Month and Year that you would like to view</h2>
-				<form name = "dostuff" action = "display.php" method = "post" onsubmit = "return verifyValues(this)">
+				<form name = "dostuff" action = "display.php" method = "post" >
 			<div class="w3-row-padding">
 				<div class="w3-half">
 					<label>Month (From 1 to 12)</label>
@@ -132,25 +174,9 @@ alert("Password or Username incorrect")
 						   name="Month" 
 						   value = "<?php echo "$monthNoZero"?>" 
 						   id="month" 
-						   class="input-xxlarge"/
-						   min = "0" max ="12" 
-						   placeholder="Month"
-						   list="months">
-						<datalist id="months">
-							<option value="0">
-							<option value="1">
-							<option value="2">
-							<option value="3">
-							<option value="4">
-							<option value="5">
-							<option value="6">
-							<option value="7">
-							<option value="8">
-							<option value="9">
-							<option value="10">
-							<option value="11">
-							<option value="12">
-						</datalist>
+						   class="input-xxlarge"
+						   min = "1" max ="12" 
+						   placeholder="Month">
 				</div>
 				<div class="w3-half">
 					<label>Year</label>
@@ -158,7 +184,7 @@ alert("Password or Username incorrect")
 				</div>
 			</div>
 			<input type="hidden" name="username" value = "<?php echo "$username"?>">
-			<input type="submit" value="New Date">
+			<input type="submit" value="New Date"onsubmit = "return verifyMonth(this)">
 		</form>
 		<br></br>
 		</div> 
@@ -169,4 +195,5 @@ alert("Password or Username incorrect")
 </html>
 <?php
 	}
-}?>
+}
+$db->close();?>

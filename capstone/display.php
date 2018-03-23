@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <?php
+include 'databaseConfig.php';
 //grab the username, month and year from the form
 $monthNoZero = $_POST["Month"];
 $year = $_POST["Year"];
 $username = $_POST["username"];
-
+if($monthNoZero == ""){
+	$monthNoZero = 1;
+}
+if($year == ""){
+	$year = 0;
+}
 //adds a 0 on the value of the month if it is less that 10
 //this is so that the SQL query will look for 01/2017 instead of 1/2017
 //so that the results will not include 11/2017 if the user choose 1
@@ -14,9 +20,9 @@ if($monthNoZero < 10){
 	$month = $monthNoZero;
 }
 
-//connect to database, only for local use right now
+//connect to databass
 //will update when the AWS RDS is set up
-$db = new mysqli("localhost", "user", "root", "test");
+$db = new mysqli($hostName, $hostUser, $hostPass, $dbName);
 $categories  = $db->query("select * from category");
 $query = "select * from entry where user_username = '".$username."' and dateEntered like '".$year."-".$month."%'";
 $result = $db->query($query);
@@ -29,17 +35,9 @@ $rows = mysqli_num_rows($result);
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" title = "bootstrapStyle">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<nav class = "navbar navbar-light" style="background-color: #CDCDCD;">
-		<div class = "container-fluid">
-			<div class = "navbar-header">
-				<h1>Capstone Budget Helper</h1>
-			</div>
-		</div>	
-	</nav>
 
 	<meta http-equiv="Content-Style" content="bootstrapStyle">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -48,8 +46,8 @@ $rows = mysqli_num_rows($result);
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <style>
-      body {background: url(assets/img/background.png) repeat;}
-      .hero-unit {background-color: white;}
+      body {background: #C6C8DCCA;}
+      .hero-unit {background-color: #dfe6e9;}
     </style>
     <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet">
     <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -62,9 +60,13 @@ $rows = mysqli_num_rows($result);
 	function verifyValues( form ) {
 		var month = form.elements[ "Month" ];
 		var year = form.elements[ "Year" ];
-		if( (isNaN(month.value) ) || (isNaN(year.value))){
+		if(month.value == "" || year.value == ""){
+			alert("both month and year need a value");
+			return false;
+		}
+		else if( (isNaN(month.value) ) || (isNaN(year.value))){
 			alert("Please enter numbers only");
-			return false
+			return false;
 		} 
 		else if (( parseInt(month.value) <0 ) || ( parseInt(month.value) >12 )) {
 			alert( "Month cannot be less than 0 or greater than 12" );
@@ -75,6 +77,16 @@ $rows = mysqli_num_rows($result);
 </script>
 
 <style>
+nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #a00000;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
 table { 
     display: table;
     border-collapse: separate;
@@ -82,7 +94,7 @@ table {
 }
 th {
     padding: 8px;
-	background-color: #a00000;
+	background-color: #636e72;
 	color: white;
 	text-align: center;
 }
@@ -92,28 +104,78 @@ td {
 tr:hover{
 	background-color: #fff5f5;
 }
+.row{
+	padding-left:20px;
+}
+.column {
+	flex: 50%;
+    padding: 5px;
+	float: left;
+}
+div.a {
+    text-align: center;
+}
 </style>
 </head>
 
   <body>
+<nav class = "navbar navbar-light" style = "background-color: #636e72;
+    position: fixed;
+    top: 0;">
+		<div class = "container-fluid">
 
+
+				<div class = "a">
+				<h1 style ="color:white;">Capstone Budget Helper</h1>
+				</div>
+				<!-- sign out button, takes the user back to the login screen-->
+				
+
+				<a type = submit href="index.html" class="btn" style = "float:right">Sign Out</a>
+			<div class = "row">
+				<form name = "dostuff" action = "display.php" method = "post" onsubmit = "return verifyValues(this)">
+							<div class= "column">
+							<b style ="color:white;">Month (From 1 to 12)</b>
+							</div>
+							<div class= "column">
+							<input type="number" 
+								   name="Month" 
+								   value = "<?php echo "$monthNoZero"?>" 
+								   id="month" 
+								   class="input-small"
+								   min = "1" max ="12" 
+								   placeholder="Month"
+								   size = "4">
+							</div>
+							<div class= "column">
+							<b style ="color:white;">Year</b>
+							</div>
+							<div class= "column">
+							<input type="number" name="Year" id="year" value = "<?php echo"$year"?>" class="input-small" min = "0" max ="9999"  placeholder = "Year">
+							<input type="hidden" name="username" value = "<?php echo "$username"?>"/>
+							</div>
+							<div class = "column">
+							<input type="submit" value="New Date"/>
+							</div>
+				</form>
+			</div>
+		</div>	
+	</nav>
     <div class="container">
 
 		
-
-		<!-- sign out button, takes the user back to the login screen-->
-		<p><a href="index.html" class="btn"><b></b> Sign Out</a></p>
 	
-	<b style = "font-size:25px;">Input Month and Year that you would like to view</b>
+	<!--<b style = "font-size:25px;">Input Month and Year that you would like to view</b>-->
 	<br></br>
-	<!-- allows the user to enter in a different date combination to view different months and years-->
+	<br></br>
+	<!-- allows the user to enter in a different date combination to view different months and years
 	<form name = "dostuff" action = "display.php" method = "post" onsubmit = "return verifyValues(this)">
 		<div class="w3-row-padding">
 			<div class="w3-half">
 				<label>Month (From 1 to 12)</label>
 				<input type="number" 
 					   name="Month" 
-					   value = "<?php echo "$monthNoZero"?>" 
+					   value = "<?php //echo "$monthNoZero"?>" 
 					   id="month" 
 					   class="input-xxlarge"/
 					   min = "0" max ="12" 
@@ -137,12 +199,12 @@ tr:hover{
 			</div>
 			<div class="w3-half">
 				<label>Year</label>
-				<input type="number" name="Year" id="year" value = "<?php echo"$year"?>" class="input-xxlarge" min = "0" max ="9999"  placeholder = "Year">
+				<input type="number" name="Year" id="year" value = "<?php //echo"$year"?>" class="input-xxlarge" min = "0" max ="9999"  placeholder = "Year">
 			</div>
 		</div>
-		<input type="hidden" name="username" value = "<?php echo "$username"?>">
+		<input type="hidden" name="username" value = "<?php //echo "$username"?>">
 		<input type="submit" value="New Date">
-	</form>
+	</form>-->
  
 
 <div class="hero-unit">
@@ -189,8 +251,19 @@ tr:hover{
 			if($rowsForCat != 0){?>
 			<table class='display'>
 				<table border = "2" cellpadding ="8">
-				<?php echo "<br></br><p style = \"font-size:30px;\">For the $catName category </p>"?>
+				<?php 
+				$budgetquery = "select * from budget where user_username = '".$username. "' and category = '".$catName."'";
+				$budgetResult = $db->query($budgetquery);
+				$budgetRows = mysqli_num_rows($budgetResult);
+				if( $budgetRows == 0){
+					echo "<br></br><p style = \"font-size:30px;\">$catName - $catDescript </p>";}
+				else{
+					$budgetRow = $budgetResult->fetch_assoc();
+					$maxAmount = $budgetRow["maxValue"];
+					echo "<br></br><p style = \"font-size:30px;\">$catName - $catDescript</p><p style = \"font-size:20px;\">$username's budget is <b style = \"font-size:20px;\">$$maxAmount  </b></p>";
+				}?>
 				<tr class='highlight'>
+					<th><h3> Spent At </h3></th>
 					<th><h3> Date Entered </h3><p> (yyyy-mm-dd) </p></th>
 					<th><h3> Desciption </h3></th>
 					<th><h3> Amount spent </h3></th>
@@ -203,9 +276,11 @@ tr:hover{
 						$date = $row["dateEntered"];
 						$descript = $row["description"];
 						$amount = $row["cost"];
+						$place = $row["placeSpent"];
 						$total = $total + $amount;
 						echo 
 							"<tr class='highlight'>
+								<td><p>$place</p></td>
 								<td><p>$date</p></td>
 								<td><p>$descript</p></td>
 								<td><p>$amount</p></td>
@@ -213,7 +288,8 @@ tr:hover{
 					}
 					echo 
 							"<tr class='highlight'>
-								<td><h4></h4></td>
+								<td><p></p></td>
+								<td><p></p></td>
 								<td><p>Total Spent in  ". $catName . " in " . $month ."/". $year ."</p></td>
 								<td><h4>$total</h4></td>
 							</tr>";
@@ -237,7 +313,8 @@ tr:hover{
 			echo "<dd>- $catDescription[$i] </dd>";
 			}
 		echo "</dl>";
-	}?>
+	}
+	$db->close();?>
     </div>
 </div>
 
